@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.link {
+  stroke: #999;
+  stroke-opacity: 0.6;
+}
+
+.nodes circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+</style>
+
+<div id="tree-container"></div>
+<!--<svg width="960" height="600"></svg>-->
+
+
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/d3/d3.min.js"></script>
+<script src="scripts/ck-tools.js"></script>
+
+<script>
+
+
+
+var viewerWidth, viewerHeight, center; // screen resolution and center
+
+// size of the diagram
+viewerWidth = $(document).width();
+viewerHeight = $(document).height();
+center = { x: viewerWidth/2, y: viewerHeight/2 };
+
+
+
+buildForceGraph(101); // output -> kittyData
+
+var nodes = [],
+    links = [],
+    kittyIDs = new Set();
+
+var svg = d3.select("#tree-container").append("svg")
+        .attr("width", viewerWidth)
+        .attr("height", viewerHeight);
+
+var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+var forceLinks = d3.forceLink().id( (d) => d.id );
+var simulation = d3.forceSimulation()
+    .force("link", forceLinks)
+    .force("charge", d3.forceManyBody())
+    .force("center", d3.forceCenter(viewerWidth / 2, viewerHeight / 2));
+
+var node = svg.selectAll(".node"),
+    link = svg.selectAll(".link");
+
+simulation
+    .nodes(nodes)
+    .on("tick", ticked);
+
+simulation.force("link")
+    .links(links);
+
+  function ticked() {
+    /*link
+        .attr("x1", (d) => d.source.x)
+        .attr("y1", (d) => d.source.y)
+        .attr("x2", (d) => d.target.x)
+        .attr("y2", (d) => d.target.y);*/
+    link = link
+        .attr('d', linkArc)
+        .attr("stroke-width", function(d) { return "2"; }).merge(link);
+
+    node  //.filter( (d) => 'x' in d )
+        .attr("cx", (d) => d.x )
+        .attr("cy", (d) => d.y );
+  }
+//});
+
+function dragstarted(d) {
+  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x;
+  d.fy = d.y;
+}
+
+function dragged(d) {
+  d.fx = d3.event.x;
+  d.fy = d3.event.y;
+}
+
+function dragended(d) {
+  if (!d3.event.active) simulation.alphaTarget(0);
+  d.fx = null;
+  d.fy = null;
+}
+
+var updatePeriod = 3500;
+var activityTimeout = 4500;
+
+var dragHandler = d3.drag()
+    .on("start", dragstarted)
+    .on("drag", dragged)
+    .on("end", dragended);
+
+
+//addNewNodes();
+var updateLoop = setTimeout(updateGraph, 500);
+checkIfDone(); // follows the loop starting
+
+// TODO: when should this be started?
+// TODO: bake in updateLoop to make into a variable function
+function checkIfDone() {
+    if (stillActive())
+        setTimeout(checkIfDone, activityTimeout);
+    else
+    {
+        console.log("DONE!");
+        clearTimeout(updateLoop);
+    }
+
+}
+
+function updateGraph() {
+    console.log(`Kitty count: ${kittyCnt}`);
+    update();
+    updateLoop = setTimeout(updateGraph, updatePeriod);
+}
+
+function update() {
+    // add new nodes
+    for (const [key, value] of Object.entries(kittyData.nodes)) {
+        if (!value.active)
+        {
+            nodes.push(value);
+            kittyIDs.add(Number(key));
+            value.active = true;
+        }
+    }
+
+    // Apply the general update pattern to the nodes.
+    node = node.data(nodes, (d) => d.id);
+    node.exit().remove();
+    node = node.enter().append("circle").attr("fill", (d) => color(d.id) ).attr("r", 8).call(dragHandler).merge(node);
+
+    // add validated links
+    functionAddValidatedLinks(links);
+
+    // Update and restart the simulation.
+    simulation.nodes(nodes);
+    simulation.force("link").links(links);
+    simulation.alpha(1).restart();
+
+    // Apply the general update pattern to the links.
+    link = link.data(links, (d) => d.source.id + "-" + d.target.id );
+    link.exit().remove();
+    //link = link.enter().append("line").attr("class","link").attr("stroke-width", function(d) { return "2"; }).merge(link);
+    link = link.enter().append('path')
+        .attr('class', 'link')
+        .attr('d', linkArc)
+        .attr("stroke-width", function(d) { return "2"; }).merge(link);
+
+}
+
+function linkArc(d) {
+    //if ( typeof d.source == 'number') return;
+    var mx = (d.target.x + d.source.x) / 2,
+        my = (d.target.y + d.source.y) / 2,
+        dx = mx - d.source.x,
+        dy = my - d.source.y,
+        dr = Math.sqrt(dx * dx + dy * dy),
+        sweepFlag = (d.target.x - d.source.x == 0) ? (d.source.x - (d.source.parent ? d.source.parent.x : 0)) < 0 : dx > 0;
+    //console.log(`M${d.source.x},${d.source.y}A${dr},${dr} 0 0,${sweepFlag ? 0 : 1} ${mx},${my} A${dr},${dr} 0 0,${+sweepFlag} ${d.target.x},${d.target.y}`);
+    return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,${sweepFlag ? 0 : 1} ${mx},${my} A${dr},${dr} 0 0,${+sweepFlag} ${d.target.x},${d.target.y}`;
+    //return `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`;
+}
+
+</script>

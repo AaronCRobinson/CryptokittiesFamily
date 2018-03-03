@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="style/tree.css">
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="bower_components/d3/d3.min.js"></script>
+  <script src="scripts/jquery.hoverIntent.minified.js"></script>
+  <script src="scripts/tree.js"></script>
+  <script src="scripts/jquery.blockUI.js"></script>
+</head>
+<body>
+  <div id="tree-container"></div>
+  <div id="bio">
+    <div id="mainbio" class="panel"></div>
+    <div id="subbio" class="panel"></div>
+  </div>
+  <div id="bottomleft">
+    <form id="interface" class="panel">
+
+      <button type="button" name="goToKitty">Go to Kitty</button><br>
+
+      <label for="kittyLimit">Kitty Limit</label>
+      <input type="text" name="kittyLimit" title="For performance, it's important to limit the total number of kitties displayed"><br>
+
+      <label for="showJewels">Show Jewels</label>
+      <input type="checkbox" name="showJewels" >
+
+      <label for="centerOnUpdate">Center on update</label>
+      <input type="checkbox" name="centerOnUpdate" >
+
+      <label for="autoCollapse">Auto collapse</label>
+      <input type="checkbox" name="autoCollapse" title="Add nodes in a collapsed state">
+
+    </form>
+    <div id="donations" class="panel">If you found this tool helpful, all donations are appreciated. ETH: 0xCB187BAbfF22a47f59cfAd0439B9d655fc9070dd</div>
+  </div>
+  <div id="bottomright">
+    <div id="discord" class="panel" target="_blank"><a href="https://discord.gg/3GvT66U">Discord</a></div>
+  </div>
+</body>
+</html>
