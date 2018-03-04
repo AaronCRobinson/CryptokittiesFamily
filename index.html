@@ -33,8 +33,10 @@ body {
 
 <div id="tree-container"></div>
 <link rel="stylesheet" type="text/css" href="style/ckstyles.css">
-<link href="http://cdn.sencha.io/ext-4.1.1-gpl/resources/css/ext-all.css" rel="stylesheet" />
-<script src="http://cdn.sencha.io/ext-4.1.1-gpl/ext-all.js"></script>
+<!--<link href="http://cdn.sencha.io/ext-4.1.1-gpl/resources/css/ext-all.css" rel="stylesheet" />
+<script src="http://cdn.sencha.io/ext-4.1.1-gpl/ext-all.js"></script>-->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/theme-crisp/resources/theme-crisp-all.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/ext-all.js"></script>
 <!-- TODO: gut jquery -->
 <script src="bower_components/jquery/dist/jquery.min.js"></script>
 <script src="bower_components/d3/d3.min.js"></script>
@@ -56,8 +58,25 @@ viewerWidth = $(document).width();
 viewerHeight = $(document).height();
 center = { x: viewerWidth/2, y: viewerHeight/2 };
 
-var kittyId = prompt("Please enter the kitty id: ", DEFAULTKITTYID);
+// TODO: redesign
+var kittyId;
+function GetKittyId()
+{
+    // check if kitty id already in url
+    var urlData = {};
+    var temp = window.location.href.split("?");
+    if (temp.length > 1)
+        urlData = Ext.urlDecode(temp[1]);
+    if ('kid' in urlData)
+        kittyId = urlData['kid'];
+    else
+    {
+        kittyId = prompt("Please enter the kitty id: ", DEFAULTKITTYID);
+        updateURL();
+    }
+}
 
+GetKittyId();
 buildForceGraph(kittyId); // output -> kittyData
 
 // TODO: should be a better way to keep track of these...
@@ -140,7 +159,7 @@ var activityTimeout = 4500;
 var nodeRadius = 29;
 
 // TEMP: lower kitty limit
-kittyLimit = 250;
+kittyLimit = 2500;
 
 var dragHandler = d3.drag()
     .on("start", dragstarted)
@@ -285,6 +304,14 @@ function update() {
     link = link.data(links, (d) => d.source.id + "-" + d.target.id );
     link.exit().remove();
     link = link.enter().insert("line", "g").attr("class","link").attr("stroke-width", 2).merge(link);
+}
+
+function updateURL() {
+    if (history.pushState) {
+        var urlData = Ext.urlEncode({'kid': kittyId});
+        var newurl =  `${window.location.protocol}//${window.location.host}${window.location.pathname}?${urlData}`;
+        window.history.pushState({path:newurl},'',newurl);
+    }
 }
 
 </script>

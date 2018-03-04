@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+    <!--<link href="http://cdn.sencha.io/ext-4.1.1-gpl/resources/css/ext-all.css" rel="stylesheet" />
+    <script src="http://cdn.sencha.io/ext-4.1.1-gpl/ext-all.js"></script>-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/theme-crisp/resources/theme-crisp-all.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/ext-all.js"></script>
+    <link rel="stylesheet" type="text/css" href="style/main.css">
+</head>
+<script>
+
+// this will nest a border layout in a border layout.
+function createDashboard() {
+    return Ext.create('Ext.panel.Panel', {
+        title: 'Dashboard',
+        cls: 'dashboard',
+        frame: false,
+        border: false,
+        bodyStyle: 'background: transparent;',
+        layout: 'border',
+        items: [
+            {
+                xtype: 'panel',
+                region: 'north',
+                height: 150,
+                items: [
+                    {
+                        xtype: 'searchfield',
+                        label: 'Query',
+                        name: 'query'
+                    }
+                ]
+            }, {
+                region: 'center',
+                html: 'center'
+            }
+        ]
+    });
+}
+
+function main() {
+    Ext.create('Ext.container.Viewport', {
+        layout: 'border',
+        items: [
+            /*{
+                xtype: 'toolbar',
+                cls: 'sidebar',
+                region: 'east',
+                frame: false,
+                width: 50,
+                layout: 'vbox',
+                items: [
+                    {
+                        html: 'test'
+                    }
+                ]
+            },*/ {
+                xtype: 'tabpanel',
+                region: 'center',
+                frame: false,
+                border: false,
+                activeTab: 0, // index or id
+                defaults: {
+                    border: false
+                },
+                items:[
+                    createDashboard(),
+                    {
+                        title: 'Relationships Graph',
+                        html: 'This is tab 2 content.'
+                    }
+                ]
+            }
+        ]
+    });
+}
+
+Ext.onReady(main);
+</script>
+</html>

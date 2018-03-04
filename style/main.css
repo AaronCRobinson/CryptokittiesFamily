@@ -1,0 +1,27 @@
+.sidebar {
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+
+}
+
+/*.x-panel-default {
+    border-color: #FFFF33;
+}
+
+.x-tab-bar-body  {
+    background-color: #FFFF33;
+}*/
+
+.dashboard {
+    /*background-color: #FFFF33;*/
+    background-image: url("https://storage.googleapis.com/ck-kitty-image/0x06012c8cf97bead5deae237070f9587f8e7a266d/456842.svg") !important;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 2500px 2500px;
+    background-position: left -850px bottom -1050px;
+}
+
+.x-panel-body-default {
+    opacity: 0.66;
+    filter: alpha(opacity=66);
+}
