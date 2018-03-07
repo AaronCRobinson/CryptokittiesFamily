@@ -48,9 +48,9 @@ body {
 var DEFAULTKITTYID = "101" // BugCat
 
 var viewerWidth, viewerHeight, center; // screen resolution and center
-var forceDistance = 50;
-var forceStrength = 0.8;
-var chargeForce = -5e3;
+var forceDistance = (n) => 200 / n.gen ? n.gen : 1;
+var forceStrength = 0.5;
+var chargeForce = -1e4;
 var zoomScale = 1; // current scale set via zooming
 
 // size of the diagram
@@ -141,17 +141,20 @@ function positionLink(d) {
 }
 
 function dragstarted(d) {
-  if (!d3.event.active) simulation.alphaTarget(1).restart();
-  d.fx = d.x, d.fy = d.y;
+    if (!d3.event.active) simulation.alphaTarget(1).restart();
+    d.fx = d.x, d.fy = d.y;
 }
 
 function dragged(d) {
-  d.fx = d3.event.x, d.fy = d3.event.y;
+    d.fx = d3.event.x, d.fy = d3.event.y;
 }
 
 function dragended(d) {
-  if (!d3.event.active) simulation.alphaTarget(0);
-  d.fx = null, d.fy = null;
+    if (!d3.event.active) simulation.alphaTarget(0);
+}
+
+function unfixNode(d) {
+    d.fx = null, d.fy = null;
 }
 
 var updatePeriod = 3500;
@@ -165,7 +168,6 @@ var dragHandler = d3.drag()
     .on("start", dragstarted)
     .on("drag", dragged)
     .on("end", dragended);
-
 
 var linkPaths = [];
 
@@ -217,6 +219,7 @@ function update() {
     gnode.exit().remove();
     var nodeEnter  = gnode.enter().append('g', ':first-child')
         .attr('class', 'node')
+        .on('dblclick', unfixNode)
         .call(dragHandler)
         .merge(gnode);
 

@@ -21,7 +21,18 @@
     background-position: left -850px bottom -1050px;
 }
 
-.x-panel-body-default {
+/* TODO: show background again */
+/*.x-panel-body-default {
     opacity: 0.66;
     filter: alpha(opacity=66);
+}*/
+
+.homeIcon {
+    background-image: url("https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/modern/theme-ios/resources/images/pictos/home.png") !important;
+
+}
+
+.largeThumbNail {
+    width: 200px;
+    height: 200px;
 }

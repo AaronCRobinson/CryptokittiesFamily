@@ -3,13 +3,20 @@
 <head>
     <!--<link href="http://cdn.sencha.io/ext-4.1.1-gpl/resources/css/ext-all.css" rel="stylesheet" />
     <script src="http://cdn.sencha.io/ext-4.1.1-gpl/ext-all.js"></script>-->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/theme-crisp/resources/theme-crisp-all.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/ext-all.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-crisp/resources/theme-crisp-all.css" rel="stylesheet" />
+    <!--<link href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/font-ext/resources/font-ext-all.css" rel="stylesheet" />-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-crisp/theme-crisp.js"></script>
+
     <link rel="stylesheet" type="text/css" href="style/main.css">
+    <link rel="stylesheet" type="text/css" href="style/ckstyles.css">
+    <script src="scripts/models.js"></script>
 </head>
 <script>
 
 // this will nest a border layout in a border layout.
+var playerAddr='';
 function createDashboard() {
     return Ext.create('Ext.panel.Panel', {
         title: 'Dashboard',
@@ -20,19 +27,41 @@ function createDashboard() {
         layout: 'border',
         items: [
             {
-                xtype: 'panel',
+                xtype: 'form',
                 region: 'north',
-                height: 150,
+                /*layout: {
+                    type: 'vbox',
+                    align : 'stretch',
+                    pack  : 'start'
+                },*/
+                //height: 150,
+                defaultType: 'textfield',
+                defaults: {
+                    border: false,
+                    margin: 5,
+                    padding: 5
+                },
                 items: [
                     {
-                        xtype: 'searchfield',
-                        label: 'Query',
-                        name: 'query'
+                        fieldLabel: 'Address',
+                        name: 'ethAddress',
+                        width: 450,
+                        enableKeyEvents: true,
+                        listeners: {
+                            'blur': (c) => {
+                                if (c.value != playerAddr)
+                                {
+                                    playerAddr = c.value;
+                                    populationPlayerKitties(playerAddr);
+                                }
+                            },
+                            'keypress': (c,e) => (e.keyCode == 13) ? c.blur() : null // blur on enter press
+                        }
                     }
                 ]
             }, {
                 region: 'center',
-                html: 'center'
+                html: '<div class="player-kitties"><div class="thumb-wrap"></div></div>'
             }
         ]
     });
@@ -61,7 +90,9 @@ function main() {
                 border: false,
                 activeTab: 0, // index or id
                 defaults: {
-                    border: false
+                    border: false,
+                    margin: 5,
+                    padding: 5
                 },
                 items:[
                     createDashboard(),
