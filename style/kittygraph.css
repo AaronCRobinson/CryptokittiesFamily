@@ -1,0 +1,25 @@
+.node {
+  cursor: pointer;
+  stroke-width: 1.5px;
+}
+
+.node circle {
+  stroke: #326B62;
+  /*stroke-width: 1.5px;*/
+}
+
+.node text {
+  font: bold 11px Calibre,Helvetica,Arial,sans-serif;
+  text-shadow: 2px 2px 3px #555555, 0px 0px 5px #FFFFFF;
+  color: #4D3636;
+}
+
+.link {
+  fill: none;
+  stroke-width: 3px;
+  stroke: #bbb;
+}
+
+body {
+  overflow:hidden;
+}

@@ -1,50 +1,3 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<style>
-
-.node {
-  cursor: pointer;
-  stroke-width: 1.5px;
-}
-
-.node circle {
-  stroke: #326B62;
-  /*stroke-width: 1.5px;*/
-}
-
-.node text {
-  font: bold 11px Calibre,Helvetica,Arial,sans-serif;
-  text-shadow: 2px 2px 3px #555555, 0px 0px 5px #FFFFFF;
-  color: #4D3636;
-}
-
-.link {
-  fill: none;
-  stroke-width: 3px;
-  stroke: #bbb;
-}
-
-body {
-  overflow:hidden;
-}
-
-
-</style>
-
-<div id="graph-container"></div>
-
-<link rel="stylesheet" type="text/css" href="style/ckstyles.css">
-<!--<link href="http://cdn.sencha.io/ext-4.1.1-gpl/resources/css/ext-all.css" rel="stylesheet" />
-<script src="http://cdn.sencha.io/ext-4.1.1-gpl/ext-all.js"></script>-->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/theme-crisp/resources/theme-crisp-all.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/ext-all.js"></script>
-<!-- TODO: gut jquery -->
-<script src="bower_components/jquery/dist/jquery.min.js"></script>
-<script src="scripts/ck-tools.js"></script>
-<script src="scripts/jquery.blockUI.js"></script>
-
-<script>
-
 var DEFAULTKITTYID = "101" // BugCat
 
 var viewerWidth, viewerHeight, center; // screen resolution and center
@@ -60,7 +13,7 @@ center = { x: viewerWidth/2, y: viewerHeight/2 };
 
 // TODO: redesign
 var kittyId;
-function GetKittyId()
+/*function GetKittyId()
 {
     // check if kitty id already in url
     var urlData = {};
@@ -74,9 +27,11 @@ function GetKittyId()
         kittyId = prompt("Please enter the kitty id: ", DEFAULTKITTYID);
         updateURL();
     }
-}
+}*/
 
-GetKittyId();
+kittyId = DEFAULTKITTYID;
+
+//GetKittyId();
 buildForceGraph(kittyId); // output -> kittyData
 
 // TODO: should be a better way to keep track of these...
@@ -286,5 +241,3 @@ function updateURL() {
         window.history.pushState({path:newurl},'',newurl);
     }
 }
-
-</script>

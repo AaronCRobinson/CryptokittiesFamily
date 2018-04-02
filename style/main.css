@@ -35,4 +35,17 @@
 .largeThumbNail {
     width: 200px;
     height: 200px;
+    margin-left: 6px;
+}
+
+.thumb-wrap {
+    /*float: left;*/
+    display: inline-block;
+    width: 225px;
+    height: 225px;
+    padding: 10px 4px 10px 10px;
+}
+
+#player-kitties {
+    /*margin: auto;*/
 }
