@@ -46,6 +46,10 @@
     padding: 10px 4px 10px 10px;
 }
 
+.inline {
+    display: inline-block;
+}
+
 #player-kitties {
     /*margin: auto;*/
 }

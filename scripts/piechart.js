@@ -1,10 +1,10 @@
 // content = [{label:..., value:..., color:...}]
 
-function generatePieChart(domId, content) {
+function generatePieChart(domId, title, content) {
     return new d3pie(domId, {
         "header": {
             "title": {
-                "text": "Type",
+                "text": title,
                 "fontSize": 24,
                 "font": "open sans"
             },
