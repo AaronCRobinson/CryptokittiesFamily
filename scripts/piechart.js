@@ -1,7 +1,7 @@
 // content = [{label:..., value:..., color:...}]
 
-function generatePieChart(domId, title, content) {
-    return new d3pie(domId, {
+function generatePieChart(domId, title, content, callbacks=null) {
+    var config = {
         "header": {
             "title": {
                 "text": title,
@@ -23,7 +23,7 @@ function generatePieChart(domId, title, content) {
             "location": "bottom-left"
         },
         "size": {
-            "canvasWidth": 590,
+            "canvasWidth": 500,
             "pieOuterRadius": "90%"
         },
         "data": {
@@ -68,5 +68,17 @@ function generatePieChart(domId, title, content) {
                 "percentage": 100
             }
         }
-    });
+    };
+
+    // NOTE: assuming object/dictionary/map
+    if (callbacks != null && Object.keys(callbacks).length > 0) {
+        config['callbacks'] = {};
+        for (var cb in callbacks) {
+            // necessary because an object's prototype contains additional properties
+            if (callbacks.hasOwnProperty(cb))
+                config['callbacks'][cb] = callbacks[cb];
+        }
+    }
+
+    return new d3pie(domId, config);
 }
