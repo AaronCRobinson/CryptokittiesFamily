@@ -1619,8 +1619,8 @@ var text = {
 			x = ((canvasWidth - canvasPadding.right) / 2) + canvasPadding.left;
 		}
 
-    // add whatever offset has been added by user
-    x += pie.options.misc.pieCenterOffset.x;
+		// add whatever offset has been added by user
+		x += pie.options.misc.pieCenterOffset.x;
 
 		var y = canvasPadding.top + textComponents.title.h;
 
@@ -1634,6 +1634,11 @@ var text = {
 			} else {
 				y += (textComponents.title.h / 4);
 			}
+			console.log(y);
+			console.log(pie.options.header.subtitle);
+			if (pie.options.header.subtitle.text != '')
+				y -= titleSubtitlePadding;
+			console.log(y);
 		}
 
 		pie.svg.select("#" + pie.cssPrefix + "title")
@@ -1678,8 +1683,8 @@ var text = {
 			x = ((canvasWidth - canvasPadding.right) / 2) + canvasPadding.left;
 		}
 
-    // add whatever offset has been added by user
-    x += pie.options.misc.pieCenterOffset.x;
+    	// add whatever offset has been added by user
+    	x += pie.options.misc.pieCenterOffset.x;
 
 		var y = text.getHeaderHeight(pie);
 		pie.svg.select("#" + pie.cssPrefix + "subtitle")
@@ -1737,7 +1742,8 @@ var text = {
 		if (pie.textComponents.title.exists) {
 
 			// if the subtitle isn't defined, it'll be set to 0
-			var totalTitleHeight = pie.textComponents.title.h + pie.options.header.titleSubtitlePadding + pie.textComponents.subtitle.h;
+			//var totalTitleHeight = pie.textComponents.title.h + pie.options.header.titleSubtitlePadding + pie.textComponents.subtitle.h;
+			var totalTitleHeight = pie.textComponents.title.h + pie.textComponents.subtitle.h;
 			if (pie.options.header.location === "pie-center") {
 				h = pie.pieCenter.y - (totalTitleHeight / 2) + totalTitleHeight;
 			} else {

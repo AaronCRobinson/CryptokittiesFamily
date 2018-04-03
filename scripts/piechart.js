@@ -1,20 +1,22 @@
 // content = [{label:..., value:..., color:...}]
 
-function generatePieChart(domId, title, content, callbacks=null) {
+function generatePieChart(domId, title, content, callbacks=null, subtitle="") {
     var config = {
         "header": {
             "title": {
                 "text": title,
-                "fontSize": 24,
+                "fontSize": 20,
                 "font": "open sans"
             },
-            /*"subtitle": {
-                "text": "A full pie chart to show off label collision detection and resolution.",
-                "color": "#999999",
-                "fontSize": 12,
+            "subtitle": {
+                "text": subtitle,
+                "color": "#333333",
+                //"color": "#999999",
+                "fontSize": 20,
                 "font": "open sans"
             },
-            "titleSubtitlePadding": 9*/
+            "titleSubtitlePadding": 2,
+            "location": "pie-center"
         },
         "footer": {
             "color": "#999999",
@@ -23,16 +25,20 @@ function generatePieChart(domId, title, content, callbacks=null) {
             "location": "bottom-left"
         },
         "size": {
-            "canvasWidth": 500,
-            "pieOuterRadius": "90%"
+            "canvasWidth": 450,
+            "canvasHeight": 450,
+            "pieInnerRadius": "50%",
+            "pieOuterRadius": "70%"
         },
         "data": {
             "sortOrder": "value-desc",
+            //"sortOrder": "label-desc",
             "content": content
         },
         "labels": {
             "outer": {
-                "pieDistance": 32
+                "pieDistance": 15,
+                //"format": "label-percentage1"
             },
             "inner": {
                 "hideWhenLessThanPercentage": 3
@@ -42,6 +48,7 @@ function generatePieChart(domId, title, content, callbacks=null) {
             },
             "percentage": {
                 "color": "#ffffff",
+                "fontSize": 10,
                 "decimalPlaces": 0
             },
             "value": {
@@ -49,7 +56,8 @@ function generatePieChart(domId, title, content, callbacks=null) {
                 "fontSize": 11
             },
             "lines": {
-                "enabled": true
+                "enabled": true,
+                "style": "straight"
             },
             "truncation": {
                 "enabled": true

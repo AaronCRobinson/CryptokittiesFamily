@@ -32,15 +32,15 @@
     }
 
     humanDesc = {
-        'body': 'Fur',
-        'eyes': 'Eye Shape',
-        'coloreyes': 'Eye Colour',
-        'colorprimary': 'Base Colour',
-        'colorsecondary': 'Highlight Colour',
-        'colortertiary': 'Accent Colour'
+        'body': ['Fur', ''],
+        'eyes': ['Eye', 'Shape'],
+        'coloreyes': ['Eye', 'Color'],
+        'colorprimary': ['Base', 'Color'],
+        'colorsecondary': ['Highlight', 'Color'],
+        'colortertiary': ['Accent', 'Color']
     }
     function getHumanDescription(desc) {
-        return (desc in humanDesc) ? humanDesc[desc] : toUpperCaseFirst(desc);
+        return (desc in humanDesc) ? humanDesc[desc] : [toUpperCaseFirst(desc), ''];
     }
 
     Ext.onReady(function(){
@@ -51,11 +51,12 @@
                     // TODO: add color
                     content.push({label:i.data.description, value:i.data.total});
                 });
-                generatePieChart(`pieChart-${g.config.groupKey}`, getHumanDescription(g.config.groupKey), content, {
+                titles = getHumanDescription(g.config.groupKey);
+                generatePieChart(`pieChart-${g.config.groupKey}`, titles[0], content, {
                     onClickSegment: function(a) {
                         window.open(`https://www.cryptokitties.co/marketplace/all?search=${a.data.label}`);
                     }
-                });
+                }, titles[1]);
             });
         });
 
