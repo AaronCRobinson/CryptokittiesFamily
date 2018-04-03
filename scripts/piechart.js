@@ -19,16 +19,17 @@ function generatePieChart(domId, title, content, callbacks=null, subtitle="") {
             "location": "pie-center"
         },
         "footer": {
-            "color": "#999999",
-            "fontSize": 10,
+            "text": `Count: ${content.length}`,
+            "color": "#333333",
+            "fontSize": 16,
             "font": "open sans",
-            "location": "bottom-left"
+            "location": "bottom-center"
         },
         "size": {
             "canvasWidth": 450,
-            "canvasHeight": 450,
-            "pieInnerRadius": "50%",
-            "pieOuterRadius": "70%"
+            "canvasHeight": 400,
+            "pieInnerRadius": "42%",
+            "pieOuterRadius": "80%"
         },
         "data": {
             "sortOrder": "value-desc",
@@ -44,7 +45,7 @@ function generatePieChart(domId, title, content, callbacks=null, subtitle="") {
                 "hideWhenLessThanPercentage": 3
             },
             "mainLabel": {
-                "fontSize": 11
+                "fontSize": 12
             },
             "percentage": {
                 "color": "#ffffff",
