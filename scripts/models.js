@@ -1,7 +1,43 @@
 var CK_API = "https://api.cryptokitties.co";
 
-// Set up a model to use in our Store
-Ext.define('Kitty', {
+Ext.define('Owner', {
+    extend: 'Ext.data.Model',
+    fields: [
+        {name: 'address',  type: 'string'},
+        {name: 'nickname', type: 'string'},
+        {name: 'image',    type: 'string'}
+    ]
+});
+
+Ext.define('Status', {
+    extend: 'Ext.data.Model',
+    fields: [
+        {name: 'is_ready',       type: 'bool'},
+        {name: 'is_gestating',   type: 'bool'},
+        {name: 'cooldown',       type: 'int'},
+        {name: 'cooldown_index', type: 'int'}
+    ]
+});
+
+Ext.define('Purrs', {
+    extend: 'Ext.data.Model',
+    fields: [
+        {name: 'count',     type: 'int'},
+        {name: 'is_purred', type: 'bool'}
+    ]
+});
+
+Ext.define('Watchlist', {
+    extend: 'Ext.data.Model',
+    fields: [
+        {name: 'count',     type: 'int'},
+        {name: 'is_purred', type: 'bool'}
+    ]
+});
+
+// NOTE: you could abstract this again...without nested models
+// Modeled more after CK auctions api data (more limited in scope)
+Ext.define('KittyBasic', {
     extend: 'Ext.data.Model',
     fields: [
         {name: 'id',            type: 'int'},
@@ -9,26 +45,33 @@ Ext.define('Kitty', {
         {name: 'image_url',     type: 'string'},
         {name: 'image_url_cdn', type: 'string'},
         {name: 'generation',    type: 'int'},
-        {name: 'image_url',     type: 'string'},
-        {name: 'created_at',    type: 'string'},
+        // {name: 'created_at',    type: 'string'}, // not found in CK auctions api
         {name: 'color',         type: 'string'},
         {name: 'is_fancy',      type: 'bool'},
         {name: 'is_exclusive',  type: 'bool'},
         {name: 'fancy_type',    type: 'string'},
-        //{name: 'status',    type: 'string'}, // object
-        //{name: 'purrs',    type: 'string'},
-        //{name: 'watchlist',    type: 'string'},
-        {name: 'hatched',       type: 'bool'},
-        //{name: 'auction',    type: 'string'}, // object
-        //{name: 'owner',    type: 'string'}, // object
-        //{name: 'sire',    type: 'string'}, // object
-        //{name: 'matron',    type: 'string'}, // object
-    ]
+        {name: 'fancy_ranking',    type: 'string'},
+        {name: 'language',    type: 'string'},
+        {name: 'hatched',       type: 'bool'}
+    ],
+    hasOne: [{
+        model: 'Owner',
+        name: 'owner'
+    }, {
+        model: 'Status',
+        name: 'status'
+    }, {
+        model: 'Purrs',
+        name: 'purrs'
+    }, {
+        model: 'Watchlist',
+        name: 'watchlist'
+    }]
 });
 
 function createPlayerKittiesStore() {
     return Ext.create('Ext.data.Store', {
-        model: 'Kitty',
+        model: 'KittyBasic',
         autoLoad: false,
         proxy: {
             type: 'ajax',
@@ -71,7 +114,7 @@ function requestPlayerKitties(addr, offset=0, limit=20, parents=false) {
 
         success: function(response, opts) {
             var obj = Ext.decode(response.responseText);
-            playerKitties.loadRawData(obj, true);
+            playerKittyStore.loadRawData(obj, true);
             if (offset + limit < obj.total)
                 requestPlayerKitties(addr, offset+limit, limit, parents);
         },
@@ -84,9 +127,9 @@ function requestPlayerKitties(addr, offset=0, limit=20, parents=false) {
 
 function populationPlayerKitties(addr) {
     console.log("populationPlayerKitties");
-    //playerKitties.clear();
-    playerKitties = createPlayerKittiesStore();
-    createPlayerKittiesView(playerKitties);
+    //playerKittyStore.clear();
+    playerKittyStore = createPlayerKittiesStore();
+    createPlayerKittiesView(playerKittyStore);
     requestPlayerKitties(addr.toLowerCase());
 }
 
@@ -99,7 +142,7 @@ Ext.define('Seller', {
     ]
 });
 
-Ext.define('Auction', {
+Ext.define('AuctionBasic', {
     extend: 'Ext.data.Model',
     fields: [
         {name: 'start_price',   type: 'string'},
@@ -113,17 +156,22 @@ Ext.define('Auction', {
         {name: 'id',             type: 'int'},
     ],
     hasOne: [{
-        model: 'Kitty',
-        name: 'kitty'
-    }, {
         model: 'Seller',
         name: 'seller'
     }]
 });
 
-function createAuctionsStore() {
+Ext.define('AuctionFull', {
+    extend: 'AuctionBasic',
+    hasOne: [{
+        model: 'KittyBasic',
+        name: 'kitty'
+    }]
+});
+
+function createAuctionStore() {
     return Ext.create('Ext.data.Store', {
-        model: 'Auction',
+        model: 'AuctionFull',
         autoLoad: false,
         proxy: {
             type: 'ajax',
@@ -133,13 +181,13 @@ function createAuctionsStore() {
             }
         },
         sorters: [{
-             property: 'id', //'start_time',
+             property: 'start_time', //'id',
              direction: 'DESC'
          }]
     });
 }
 
-function createAuctionsView(store, target) {
+function createAuctionView(store, target) {
     var kittyTpl = new Ext.XTemplate(
         '<tpl for=".">',
             '<div class="thumb-wrap">',
@@ -179,11 +227,11 @@ function requestAuctions(offset=0, limit=20, parents=false) {
     function ajaxRequest(offset, limit) {
         Ext.Ajax.request({
             // TODO: variable type here
-            url: `${CK_API}/auctions?offset=${offset}&limit=${limit}&type=sale&status=open&orderBy=id&orderDirection=desc&parents=${parents}`,
+            url: `${CK_API}/auctions?offset=${offset}&limit=${limit}&type=sale&status=open&orderBy=start_time&orderDirection=desc&parents=${parents}`,
 
             success: function(response, opts) {
                 var obj = Ext.decode(response.responseText);
-                auctions.loadRawData(obj, true);
+                auctionStore.loadRawData(obj, true);
                 if (offset + limit < obj.total)
                     setTimeout(()=> {requestAuctions(offset+limit, limit, parents);}, briefWait);
             },
@@ -201,8 +249,8 @@ function requestAuctions(offset=0, limit=20, parents=false) {
 
 function populationAuctions() {
     console.log("populationAuctions");
-    auctions = createAuctionsStore();
-    createAuctionsView(auctions);
+    auctionStore = createAuctionStore();
+    createAuctionView(auctionStore);
     requestAuctions();
 }
 
@@ -215,7 +263,7 @@ Ext.define('Cattribute', {
     ]
 });
 
-function createCattributesStore() {
+function createCattributeStore() {
     return Ext.create('Ext.data.Store', {
         model: 'Cattribute',
         autoLoad: false,
@@ -236,8 +284,8 @@ function requestCattributes(callback) {
 
             success: function(response, opts) {
                 var obj = Ext.decode(response.responseText);
-                cattributes.loadRawData(obj, true);
-                cattributes.group('type');
+                cattributeStore.loadRawData(obj, true);
+                cattributeStore.group('type');
                 if (callback != null) callback();
             },
 
@@ -254,7 +302,88 @@ function requestCattributes(callback) {
 
 function populationCattributes(callback = null) {
     console.log("populationCattributes");
-    cattributes = createCattributesStore();
+    cattributeStore = createCattributeStore();
     //createCattributesView(cattributes); // NOTE: I think the view here creates unnecessary complexity -- just read the store directly
     requestCattributes(callback);
+}
+
+Ext.define('EnhancedCattribute', {
+    extend: 'Ext.data.Model',
+    fields: [
+        {name: 'type',        type: 'string'},
+        {name: 'kittyId',     type: 'string'},
+        {name: 'position',    type: 'int'},
+        {name: 'description', type: 'string'}
+    ]
+});
+
+// Set up a model to use in our Store
+// TODO: return to sire/matron/chidlren
+Ext.define('KittyFull', {
+    extend: 'KittyBasic',
+    fields: [
+        //  {name: 'enhanced_cattributes'}
+        //{name: 'children',    type: 'string'}, // object
+        //{name: 'sire',    type: 'string'}, // object
+        //{name: 'matron',    type: 'string'}, // object
+    ],
+    hasOne: [{
+        model: 'AuctionBasic',
+        name: 'auction'
+    }],
+    hasMany: [{
+        model: 'EnhancedCattribute',
+        name: 'enhanced_cattributes'
+    }]
+});
+
+function buildKittyEra(start, end, callback = null) {
+    kittyEraStore = createKittyEraStore();
+    requestKittyEra(kittyEraStore, start, end, callback);
+}
+
+function createKittyEraStore() {
+    return Ext.create('Ext.data.Store', {
+        model: 'KittyFull',
+        autoLoad: false,
+        proxy: {
+            type: 'ajax',
+            reader: {
+                type: 'json',
+                root: (d) => d // no root
+            }
+        }
+    });
+}
+
+function requestKittyEra(store, start, end, callback = null) {
+    // enforce datatypes...
+    start = parseInt(start);
+    end = parseInt(end);
+
+    function ajaxRequest(id) {
+        Ext.Ajax.request({
+            url: `${CK_API}/kitties/${id}`,
+
+            success: function(response, opts) {
+                var obj = Ext.decode(response.responseText);
+                store.loadRawData(obj, true);
+                if (id == end) {
+                    //store.group('type');
+                    if (callback != null) callback();
+                    return;
+                }
+                // else still more data
+                setTimeout(()=> {ajaxRequest(id+1);}, briefWait);
+            },
+
+            failure: function(response, opts) {
+                if (response.status == 429) // retry after 61 seconds
+                    setTimeout(() => {ajaxRequest(id);}, waitAMin);
+                else
+                    console.log('server-side failure with status code ' + response.status);
+            }
+        });
+    }
+    ajaxRequest(start);
 }

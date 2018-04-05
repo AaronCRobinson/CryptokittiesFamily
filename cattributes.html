@@ -45,7 +45,7 @@
 
     Ext.onReady(function(){
         populationCattributes( () => {
-            cattributes.getGroups().items.forEach( (g) => {
+            cattributeStore.getGroups().items.forEach( (g) => {
                 var content = [];
                 g.items.forEach( (i) => {
                     // TODO: add color

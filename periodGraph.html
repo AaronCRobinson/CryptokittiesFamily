@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+    <!--<link href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/theme-crisp/resources/theme-crisp-all.css" rel="stylesheet" />-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/ext-all.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.7.2/d3.min.js"></script>
+    <script src="scripts/d3pie.js"></script>
+
+    <script src="scripts/models.js"></script>
+    <script src="scripts/piechart.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="style/main.css">
+    <link rel="stylesheet" type="text/css" href="style/ckstyles.css">
+</head>
+
+<body>
+    <div class="inline" id="pieChart-body"></div>
+    <div class="inline" id="pieChart-coloreyes"></div>
+    <div class="inline" id="pieChart-colorprimary"></div>
+    <div class="inline" id="pieChart-colorsecondary"></div>
+    <div class="inline" id="pieChart-colortertiary"></div>
+    <div class="inline" id="pieChart-eyes"></div>
+    <div class="inline" id="pieChart-mouth"></div>
+    <div class="inline" id="pieChart-pattern"></div>
+    <div class="inline" id="pieChart-wild"></div>
+</body>
+
+<script>
+
+    // TODO: bring this out into a file for reuse
+    function toUpperCaseFirst(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    humanDesc = {
+        'body': ['Fur', ''],
+        'eyes': ['Eye', 'Shape'],
+        'coloreyes': ['Eye', 'Color'],
+        'colorprimary': ['Base', 'Color'],
+        'colorsecondary': ['Highlight', 'Color'],
+        'colortertiary': ['Accent', 'Color']
+    }
+    function getHumanDescription(desc) {
+        return (desc in humanDesc) ? humanDesc[desc] : [toUpperCaseFirst(desc), ''];
+    }
+
+    // NOTE: this walking strategy only works above a certain kitty id
+    function main() {
+        // #1: get start and stop
+        var urlData = {};
+        var temp = window.location.href.split("?");
+        if (temp.length > 1) // check for data in url
+            urlData = Ext.urlDecode(temp[1]);
+        console.log(urlData);
+
+        if ('start' in urlData)
+            startID = urlData['start'];
+        else
+            startID = prompt("Please enter the start kitty id: ");
+
+        if ('end' in urlData)
+            endID = urlData['end'];
+        else
+            endID = prompt("Please enter the end kitty id: ");
+        //updateURL();
+
+        populationCattributes(function() {
+
+            buildKittyEra(startID, endID, () => {
+                // build map
+                var cattributeCnts = {};
+                cattributeStore.getData().items.forEach( (cattribute) => {
+                    var data = cattribute.data; // getting reference
+                    data['count'] = 0; // init new variable
+                    cattributeCnts[data.description] = data;
+                });
+
+                // loop over kitties
+                kittyEraStore.getData().items.forEach( (kitty) => {
+                    // loop over kitty's cattributes, adding counts
+                    kitty.enhanced_cattributes().getData().items.forEach( (cattribute) => {
+                        cattributeCnts[cattribute.getData().description]['count']++;
+                    });
+                });
+
+                // generate graphs per each groupings
+                cattributeStore.getGroups().items.forEach( (g) => {
+                    var content = [];
+                    g.items.forEach( (i) => {
+                        // TODO: add color
+                        content.push({label:i.data.description, value:i.data.count});
+                    });
+
+                    titles = getHumanDescription(g.config.groupKey);
+                    generatePieChart(`pieChart-${g.config.groupKey}`, titles[0], content, {
+                        onClickSegment: function(a) {
+                            //window.open(`https://www.cryptokitties.co/marketplace/all?search=${a.data.label}`);
+                        }
+                    }, titles[1]);
+                });
+
+            });
+
+        });
+    }
+
+    Ext.onReady(main);
+</script>
+
+</html>
