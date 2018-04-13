@@ -69,6 +69,7 @@
 
             buildKittyEra(startID, endID, () => {
                 // build map
+                console.log(`${(new Date()).getTime()} - build map`);
                 var cattributeCnts = {};
                 cattributeStore.getData().items.forEach( (cattribute) => {
                     var data = cattribute.data; // getting reference
@@ -77,6 +78,7 @@
                 });
 
                 // loop over kitties
+                console.log(`${(new Date()).getTime()} - loop kitties`);
                 kittyEraStore.getData().items.forEach( (kitty) => {
                     // loop over kitty's cattributes, adding counts
                     kitty.enhanced_cattributes().getData().items.forEach( (cattribute) => {
@@ -85,6 +87,7 @@
                 });
 
                 // generate graphs per each groupings
+                console.log(`${(new Date()).getTime()} - per group`);
                 cattributeStore.getGroups().items.forEach( (g) => {
                     var content = [];
                     g.items.forEach( (i) => {
