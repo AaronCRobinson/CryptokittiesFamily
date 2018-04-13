@@ -91,19 +91,33 @@ function createPlayerKittiesView(store, target) {
     var kittyTpl = new Ext.XTemplate(
         '<tpl for=".">',
             '<div class="thumb-wrap">',
-                '<div class="u-bg-alt-{color}"><img class="largeThumbNail" src="{image_url}"></div>',
-                '<div>{id} - {name}</div>',
-                '<div>body: {genes.body.D0} {genes.body.R1} {genes.body.R2} {genes.body.R3}</div>',
-                '<div>bodyColor: {genes.bodycolor.D0} {genes.bodycolor.R1} {genes.bodycolor.R2} {genes.bodycolor.R3}</div>',
-                '<div>eyeColor: {genes.eyecolor.D0} {genes.eyecolor.R1} {genes.eyecolor.R2} {genes.eyecolor.R3}</div>',
-                '<div>eyeType: {genes.eyetype.D0} {genes.eyetype.R1} {genes.eyetype.R2} {genes.eyetype.R3}</div>',
-                '<div>mouth: {genes.mouth.D0} {genes.mouth.R1} {genes.mouth.R2} {genes.mouth.R3}</div>',
-                '<div>pattern: {genes.pattern.D0} {genes.pattern.R1} {genes.pattern.R2} {genes.pattern.R3}</div>',
-                '<div>patternColor: {genes.patterncolor.D0} {genes.patterncolor.R1} {genes.patterncolor.R2} {genes.patterncolor.R3}</div>',
-                '<div>secondaryColor: {genes.secondarycolor.D0} {genes.secondarycolor.R1} {genes.secondarycolor.R2} {genes.secondarycolor.R3}</div>',
-                '<div>wild: {genes.wild.D0} {genes.wild.R1} {genes.wild.R2} {genes.wild.R3}</div>',
+                '<a href="https://www.cryptokitties.co/kitty/{id}" target="_blank">',
+                    '<div class="u-bg-alt-{color}"><img class="largeThumbNail" src="{image_url}"></div>',
+                '</a>',
+                '<div class="mono">{id}</div>',
+                '<div class="mono">{name}</div>',
+                '<div class="mono">BODY  : {[this.abbreviate(values.genes.body.D0)]} {[this.abbreviate(values.genes.body.R1)]} {[this.abbreviate(values.genes.body.R2)]} {[this.abbreviate(values.genes.body.R3)]}</div>',
+                '<div class="mono">BDYCLR: {[this.abbreviate(values.genes.bodycolor.D0)]} {[this.abbreviate(values.genes.bodycolor.R1)]} {[this.abbreviate(values.genes.bodycolor.R2)]} {[this.abbreviate(values.genes.bodycolor.R3)]}</div>',
+                '<div class="mono">EYECLR: {[this.abbreviate(values.genes.eyecolor.D0)]} {[this.abbreviate(values.genes.eyecolor.R1)]} {[this.abbreviate(values.genes.eyecolor.R2)]} {[this.abbreviate(values.genes.eyecolor.R3)]}</div>',
+                '<div class="mono">EYETYP: {[this.abbreviate(values.genes.eyetype.D0)]} {[this.abbreviate(values.genes.eyetype.R1)]} {[this.abbreviate(values.genes.eyetype.R2)]} {[this.abbreviate(values.genes.eyetype.R3)]}</div>',
+                '<div class="mono">MOUTH : {[this.abbreviate(values.genes.mouth.D0)]} {[this.abbreviate(values.genes.mouth.R1)]} {[this.abbreviate(values.genes.mouth.R2)]} {[this.abbreviate(values.genes.mouth.R3)]}</div>',
+                '<div class="mono">PATERN: {[this.abbreviate(values.genes.pattern.D0)]} {[this.abbreviate(values.genes.pattern.R1)]} {[this.abbreviate(values.genes.pattern.R2)]} {[this.abbreviate(values.genes.pattern.R3)]}</div>',
+                '<div class="mono">PTNCLR: {[this.abbreviate(values.genes.patterncolor.D0)]} {[this.abbreviate(values.genes.patterncolor.R1)]} {[this.abbreviate(values.genes.patterncolor.R2)]} {[this.abbreviate(values.genes.patterncolor.R3)]}</div>',
+                '<div class="mono">SECCLR: {[this.abbreviate(values.genes.secondarycolor.D0)]} {[this.abbreviate(values.genes.secondarycolor.R1)]} {[this.abbreviate(values.genes.secondarycolor.R2)]} {[this.abbreviate(values.genes.secondarycolor.R3)]}</div>',
+                '<div class="mono">WILD  : {[this.abbreviate(values.genes.wild.D0)]} {[this.abbreviate(values.genes.wild.R1)]} {[this.abbreviate(values.genes.wild.R2)]} {[this.abbreviate(values.genes.wild.R3)]}</div>',
             '</div>',
-        '</tpl>'
+        '</tpl>',
+        {
+            // XTemplate configuration:
+            disableFormats: true,
+            abbreviate: function(s) {
+                //s = s.toUpperCase();
+                var idx = s.indexOf("_");
+                if (idx != -1)
+                    return s.substr(idx+1).toUpperCase();
+                return s.substr(0,3).toUpperCase();
+            }
+        }
     );
 
     /*var tip = new Ext.tip.ToolTip({
