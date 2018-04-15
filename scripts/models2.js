@@ -357,10 +357,12 @@ function requestCattributes(callback) {
 }
 
 function populationCattributes(callback = null) {
-    console.log("populationCattributes");
-    cattributeStore = createCattributeStore();
-    //createCattributesView(cattributes); // NOTE: I think the view here creates unnecessary complexity -- just read the store directly
-    requestCattributes(callback);
+    if (typeof cattributeStore == 'undefined' ) {
+        cattributeStore = createCattributeStore();
+        //createCattributesView(cattributes); // NOTE: I think the view here creates unnecessary complexity -- just read the store directly
+        requestCattributes(callback);
+    } else // Assume: store already loaded
+        callback();
 }
 
 Ext.define('EnhancedCattribute', {

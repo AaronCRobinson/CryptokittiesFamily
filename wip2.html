@@ -22,11 +22,14 @@
     <script src="scripts/models2.js"></script>
     <script src="scripts/kittygraph.js"></script>
 
+    <script src="scripts/searchParser.js"></script>
+
 </head>
 <script>
 
 // this will nest a border layout in a border layout.
-var playerAddr='';
+var playerAddr=null;
+var curFilter=null;
 function createDashboard() {
     return Ext.create('Ext.panel.Panel', {
         title: 'Dashboard',
@@ -63,12 +66,32 @@ function createDashboard() {
                                 {
                                     playerAddr = c.value;
                                     populationPlayerKitties(playerAddr);
-                                    playerKittyStore.filterBy( (kitty) => {
+
+                                    // apply filters
+                                    //playerKittyStore.filterBy(parseSearchQuery("gen<5 munchkin"));
+                                    /*playerKittyStore.filterBy( (kitty) => {
                                         var wildGenes = kitty.getGenes().getWild().getData();
                                         if (wildGenes.D0 == "wild_a" || wildGenes.R1 == "wild_a"|| wildGenes.R2 == "wild_a" || wildGenes.R3 == "wild_a")
                                             return true;
                                         return false;
-                                    });
+                                    });*/
+                                }
+                            },
+                            'keypress': (c,e) => (e.keyCode == 13) ? c.blur() : null // blur on enter press
+                        }
+                    }, {
+                        fieldLabel: 'Filter',
+                        name: 'kittyFilter',
+                        width: 450,
+                        enableKeyEvents: true,
+                        listeners: {
+                            'blur': (c) => {
+                                if (c.value != curFilter)
+                                {
+                                    curFilter = c.value;
+                                    console.log(curFilter);
+                                    playerKittyStore.clearFilter();
+                                    playerKittyStore.filterBy(parseSearchQuery(curFilter));
                                 }
                             },
                             'keypress': (c,e) => (e.keyCode == 13) ? c.blur() : null // blur on enter press
@@ -121,6 +144,8 @@ function main() {
             }
         ]
     });
+    initSearchParser();
+
 }
 
 Ext.onReady(main);
