@@ -135,40 +135,70 @@ function createPlayerKittiesView(store, target) {
     });
 }
 
+// returns data in callback (data is keyed on id)
+function requestEnhancedCattributes(ids, callback) {
+    var data = {};
+
+    function ajaxRequest(id) {
+        console.log(`ajaxRequest: ${id}`);
+        Ext.Ajax.request({
+            url: `${CK_API}/kitties/${id}`,
+
+            success: function(response, opts) {
+                var obj = Ext.decode(response.responseText);
+                data[id] = obj;
+                id = ids.pop();
+                if (id == undefined) {
+                    if (callback != null) callback(data);
+                    return;
+                }
+                // else still more data
+                setTimeout(()=> {ajaxRequest(id);}, briefWait);
+            },
+
+            failure: function(response, opts) {
+                if (response.status == 429) // retry after 61 seconds
+                    setTimeout(() => {ajaxRequest(id);}, waitAMin);
+                else
+                    console.log('server-side failure with status code ' + response.status);
+            }
+        });
+    }
+    ajaxRequest(ids.pop());
+}
+
 // TODO: rework
 function requestPlayerKitties(addr, offset=0, limit=20, parents=false) {
-    //console.log(`${CK_API}/kitties?offset=${offset}&limit=${limit}&owner_wallet_address=${addr}&parents=${parents}`);
+    // get enchanced_cattributes
+
     Ext.Ajax.request({
         url: `${CK_API}/kitties?offset=${offset}&limit=${limit}&owner_wallet_address=${addr}&parents=${parents}`,
 
         success: function(response, opts) {
             var ckData = Ext.decode(response.responseText);
-            // HODL to CUDL
-            //playerKittyStore.loadRawData(obj, true);
 
-            // need to get DNA (using geggs api)
-            Ext.Ajax.request({
-                url: 'http://dna.cryptokittydata.info/fetch/dna',
-                method: 'POST',
-                jsonData: {
-                    kitties: ckData.kitties//[{id:101}]
-                },
-                success: function(response, opts) {
-                    var geneData = Ext.decode(response.responseText);
-                    //console.log(geneData);
+            requestEnhancedCattributes(ckData.kitties.map(x => x.id), (ec) => {
+                console.log("callback starts");
+                // need to get DNA (using geggs api)
+                Ext.Ajax.request({
+                    url: 'http://dna.cryptokittydata.info/fetch/dna',
+                    method: 'POST',
+                    jsonData: { kitties: ckData.kitties },
+                    success: function(response, opts) {
+                        console.log(ec);
+                        var geneData = Ext.decode(response.responseText);
 
-                    // TODO: consider more efficent methods here
-                    // weave data so that ExtJS can consume it easily
+                        // TODO: consider more efficent methods here
+                        // weave data so that ExtJS can consume it easily
 
-                    ckData.kitties.forEach( (kitty) => {
-                        kitty.genes = geneData[kitty.id];
-                    });
+                        ckData.kitties.forEach( (kitty) => {
+                            kitty.genes = geneData[kitty.id];
+                        });
 
-                    console.log(ckData);
-
-                    // fruit roll-up
-                    playerKittyStore.loadRawData(ckData, true);
-                }
+                        // fruit roll-up
+                        playerKittyStore.loadRawData(ckData, true);
+                    }
+                });
             });
 
             if (offset + limit < ckData.total)
@@ -176,13 +206,15 @@ function requestPlayerKitties(addr, offset=0, limit=20, parents=false) {
         },
 
         failure: function(response, opts) {
-            console.log('server-side failure with status code ' + response.status);
+            if (response.status == 429) // retry after 61 seconds
+                setTimeout(() => {ajaxRequest(id);}, waitAMin);
+            else
+                console.log('server-side failure with status code ' + response.status);
         }
     });
 }
 
 function populationPlayerKitties(addr) {
-    console.log("populationPlayerKitties");
     //playerKittyStore.clear();
     playerKittyStore = createPlayerKittiesStore();
     createPlayerKittiesView(playerKittyStore);
